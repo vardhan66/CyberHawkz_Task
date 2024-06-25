@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Chart</title>
+    <!-- Include Moment.js -->
+    <script src="https://cdn.jsdelivr.net/npm/moment"></script>
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include Chart.js Moment.js adapter -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
+</head>
+<body>
+    <canvas id="salesChart" width="800" height="400"></canvas>
+    <script>
+        // Parse JSON data from Django context
+        const salesData = JSON.parse('{{ salesData|safe }}');
+
+        // Format data for Chart.js
+        const formattedData = salesData.map(item => ({
+            x: moment(`${item.saleDate__year}-${item.saleDate__month}`, 'YYYY-MM').toDate(),
+            y: parseFloat(item.totalAmount)
+        }));
+
+        // Initialize Chart.js with configured options
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                datasets: [{
+                    label: 'Total Sales',
+                    data: formattedData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time', // Use 'time' type if x-axis is date/time
+                        time: {
+                            unit: 'month', // Adjust time unit as needed
+                            tooltipFormat: 'MMM YYYY' // Tooltip format
+                        },
+                        title: {
+                            display: true,
+                            text: 'Month/Year'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Total Amount'
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.raw.y;
+                                return `Total Amount: ${value}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
