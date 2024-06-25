@@ -3,7 +3,7 @@
 
 ### Prerequisites
 
-- Python 3.12.1+
+- Python 3.8+ (3.12.1)
 - PostgreSQL
 - Redis
 
